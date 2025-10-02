@@ -62,6 +62,7 @@ void SystemClock_Config(void);
 uint32_t ticks = 0;
 uint8_t flag = 0;
 uint8_t rx_msg[4];
+uint8_t tx_msg[10];
 /* USER CODE END 0 */
 
 /**
@@ -99,9 +100,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim1);
   HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
-  uint8_t tx_msg[] = "RoboMaster";
+
   HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_SET);
-  HAL_UART_Receive_IT(&huart7, rx_msg, 1);
+
+  HAL_UART_Receive_IT(&huart7, rx_msg, 3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,10 +111,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    HAL_UART_Receive_IT(&huart7, rx_msg, 3);
     /* USER CODE BEGIN 3 */
-    HAL_UART_Transmit(&huart7,tx_msg,10,1000);
-    HAL_Delay(1000);
+    //HAL_UART_Transmit(&huart7,tx_msg,10,1000);
+    //HAL_Delay(1000);
   }
 
 }

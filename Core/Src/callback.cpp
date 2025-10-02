@@ -6,6 +6,7 @@
 
 extern uint32_t ticks;
 extern uint8_t rx_msg[4];
+extern uint8_t tx_msg[10];
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == &htim1)
@@ -26,16 +27,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart == &huart7)
     {
-        if (rx_msg[0] == 'R')
-        {
-            HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_SET);
 
+        HAL_UART_Transmit(&huart7,rx_msg,3,1000);
 
-        }
-        else if (rx_msg[0] == 'M')
-        {
-            HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_RESET);
-        }
-        HAL_UART_Receive_IT(&huart7, rx_msg, 1);
     }
 }
