@@ -1,11 +1,12 @@
 #include "can.h"
+#include "motor.h"
 #include "tim.h"
 extern CAN_RxHeaderTypeDef rx_header;
 extern CAN_TxHeaderTypeDef tx_header;
 extern uint8_t tx_data[8];
 extern uint8_t rx_data[8];
 extern uint32_t can_tx_mail_box_;
-
+extern M3508_Motor Motor(3591/187);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim->Instance == htim6.Instance)
@@ -21,7 +22,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &rx_header, rx_data);
         if (rx_header.StdId == 0x201)
         {
-            //Motor.canRxMsgCallback(rx_data);
+            Motor.canRxMsgCallback(rx_data);
         }
     }
 }

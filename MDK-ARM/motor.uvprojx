@@ -428,6 +428,11 @@
               <FileType>8</FileType>
               <FilePath>..\Core\Src\callback.cpp</FilePath>
             </File>
+            <File>
+              <FileName>motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Src\motor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
