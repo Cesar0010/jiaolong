@@ -2,6 +2,9 @@
 // Created by Sesar on 2025/10/20.
 //
 #include "motor.h"
+
+#include <cmath>
+extern uint8_t tx_data[8];
 float linearMapping(float input, float input_min, float input_max, float output_min, float output_max)
 {
     return (input - input_min) * (output_max - output_min) / (input_max - input_min) + output_min;
@@ -26,6 +29,11 @@ void Motor::canRxMsgCallback(const uint8_t rx_data[8])
     current_raw = static_cast<float>(current_raw);
     current_ = linearMapping(current_raw, -16384.0, 16383.0, -20.0, 20.0);
     temp_ = rx_data[6];
+    if (flag == true)
+    {
+        flag = false;
+        angle_ = 0.0;
+    }
 }
 
 void Motor::SetPosition(float target_position, float feedforward_speed, float feedforward_intensity)
@@ -72,5 +80,18 @@ void Motor::handle()
                 output_intensity_ = intensity_from_speed + feedforward_intensity_;
             }
     }
+}
+
+void Motor::FeedforwardIntensityCalc()
+{
+    feedforward_intensity_ = 0.5*9.8*sin(angle_/180*3.14159265358979323846)*0.05524/0.3*16384/20;
+
+}
+
+void Motor::output()
+{
+    int intensity = static_cast<int>(output_intensity_);
+    tx_data[0] = (intensity >> 8) & 0xFF;
+    tx_data[1] = intensity & 0xFF;
 }
 

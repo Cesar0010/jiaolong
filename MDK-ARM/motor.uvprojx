@@ -388,16 +388,26 @@
               <FileType>2</FileType>
               <FilePath>startup_stm32f427xx.s</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Application/User/Core</GroupName>
-          <Files>
+            <File>
+              <FileName>motor.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Core\Src\motor.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>pid.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Core\Src\pid.cpp</FilePath>
+            </File>
             <File>
               <FileName>callback.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\Core\Src\callback.cpp</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/User/Core</GroupName>
+          <Files>
             <File>
               <FileName>motor.h</FileName>
               <FileType>5</FileType>

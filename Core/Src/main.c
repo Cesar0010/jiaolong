@@ -56,9 +56,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t stop_flag = 1;
 uint8_t rx_data[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-uint8_t tx_data[8] = {0x00,0x00,0x00,0xC0,0x00,0x00,0x00,0x00};
+uint8_t tx_data[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 uint32_t can_tx_mail_box_;
 CAN_RxHeaderTypeDef rx_header;
 CAN_TxHeaderTypeDef tx_header = {
@@ -130,9 +130,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    if (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) == 1)
+    {
+      HAL_Delay(10);
+      if (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) == 1)
+      {
+        while (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) == 1);
+        stop_flag = !stop_flag;
+      }
+    }
   }
-  /* USER CODE END 3 */
 }
+  /* USER CODE END 3 */
+
 
 /**
   * @brief System Clock Configuration
