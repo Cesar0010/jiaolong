@@ -1,42 +1,53 @@
 #include <stdint.h>
-
-class M3508_Motor
+#include "pid.h"
+class Motor
 {
-private:
+    private:
     const float ratio_;
-    float angle_ = 0.0f;
-    float delta_angle_ = 0.0f;
-    float ecd_angle_ = 0.0f;
-    float last_ecd_angle_ = 0.0f;
-    float delta_ecd_angle_ = 0.0f;
-    float rotate_speed_ = 0.0f;
-    float current_ = 0.0f;
-    float temp_ = 0.0f;
+    float angle_;
+    float delta_angle_;
+    float ecd_angle_;
+    float last_ecd_angle_;
+    float delta_ecd_angle_;
+    float rotate_speed_;
+    float current_;
+    float temp_;
+    PID spid_, ppid_;
+    float target_angle_, fdb_angle_;
+    float target_speed_, fdb_speed_, feedforward_speed_;
+    float feedforward_intensity_, output_intensity_;
+    enum {
+        TORQUE,
+        SPEED,
+        POSITION_SPEED,
+      } control_method_;
 public:
-    explicit M3508_Motor(const float ratio) : ratio_(ratio) {};
-    void canRxMsgCallback(const uint8_t rx_data[8]);
-};
-float linearMapping(float input, float input_min, float input_max, float output_min, float output_max)
-{
-    return (input - input_min) * (output_max - output_min) / (input_max - input_min) + output_min;
-}
-void M3508_Motor::canRxMsgCallback(const uint8_t rx_data[8])
-{
-    last_ecd_angle_ = ecd_angle_;
-    ecd_angle_ = (rx_data[0] << 8) | rx_data[1];
-    ecd_angle_=linearMapping(ecd_angle_, 0.0, 8191.0, 0.0, 360.0);
-    delta_ecd_angle_ = ecd_angle_ - last_ecd_angle_;
-    if (delta_ecd_angle_ > 180.0f) {
-        delta_ecd_angle_ -= 360.0f;
-    } else if (delta_ecd_angle_ < -180.0f) {
-        delta_ecd_angle_ += 360.0f;
+    void SetPosition(float target_position, float feedforward_speed, float feedforward_intensity);
+    void SetSpeed(float target_speed, float feedforward_intensity);
+    void SetIntensity(float intensity);
+    Motor(const float ratio, float p_kp, float p_ki, float p_kd, float s_kp, float s_ki, float s_kd,float p_imax, float s_imax, float p_out_max, float s_out_max, float p_d_filter_k, float s_d_filter_k)
+    : ratio_(ratio),
+      spid_(s_kp, s_ki, s_kd, s_imax, s_out_max, s_d_filter_k),
+      ppid_(p_kp, p_ki, p_kd, p_imax, p_out_max, p_d_filter_k)
+    {
+        angle_ = 0.0f;
+        ecd_angle_ = 0.0f;
+        last_ecd_angle_ = 0.0f;
+        delta_ecd_angle_ = 0.0f;
+        delta_angle_ = 0.0f;
+        rotate_speed_ = 0.0f;
+        current_ = 0.0f;
+        temp_ = 0.0f;
+        target_angle_ = 0.0f;
+        target_speed_ = 0.0f;
+        fdb_angle_ = 0.0f;
+        fdb_speed_ = 0.0f;
+        feedforward_speed_ = 0.0f;
+        feedforward_intensity_ = 0.0f;
+        output_intensity_ = 0.0f;
+        control_method_ = TORQUE;
     }
-    delta_angle_ = delta_ecd_angle_ /ratio_;
-    angle_ += delta_angle_;
-    int16_t speed_raw = (rx_data[2] << 8) | rx_data[3];
-    rotate_speed_ = static_cast<float>(speed_raw);
-    int16_t current_raw = (rx_data[4] << 8) | rx_data[5];
-    current_raw = static_cast<float>(current_raw);
-    current_ = linearMapping(current_raw, -16384.0, 16383.0, -20.0, 20.0);
-    temp_ = rx_data[6];
-}
+    void canRxMsgCallback(const uint8_t rx_data[8]);
+    void handle();
+};
+
