@@ -11,7 +11,8 @@ extern uint8_t tx_data[8];
 extern uint8_t rx_data[8];
 extern uint32_t can_tx_mail_box_;
 extern uint8_t stop_flag;
-Motor motor(3591.0f/187.0f,0,0,0,0,0,0,0,0,0,0,0,0);
+extern float target_angle;
+Motor motor(3591.0f/187.0f,10,0,0,22,0,6,1000,1000,5000,5000,0.1,0.02);
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -32,7 +33,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         if (rx_header.StdId == 0x201)
         {
             motor.canRxMsgCallback(rx_data);
-            motor.FeedforwardIntensityCalc();
+            float feedforward_intensity =motor.FeedforwardIntensityCalc();
+            motor.SetPosition(target_angle,0.0f,feedforward_intensity);
+            //motor.SetSpeed(target_angle,feedforward_intensity);
+            //motor.SetIntensity(feedforward_intensity);
             motor.handle();
             motor.output();
         }

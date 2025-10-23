@@ -29,11 +29,13 @@ void Motor::canRxMsgCallback(const uint8_t rx_data[8])
     current_raw = static_cast<float>(current_raw);
     current_ = linearMapping(current_raw, -16384.0, 16383.0, -20.0, 20.0);
     temp_ = rx_data[6];
-    if (flag == true)
+    if (init_flag_ == true)
     {
-        flag = false;
+        init_flag_ = false;
         angle_ = 0.0;
     }
+    fdb_angle_ = angle_;
+    fdb_speed_ = rotate_speed_;
 }
 
 void Motor::SetPosition(float target_position, float feedforward_speed, float feedforward_intensity)
@@ -46,7 +48,7 @@ void Motor::SetPosition(float target_position, float feedforward_speed, float fe
 
 void Motor::SetSpeed(float target_speed, float feedforward_intensity)
 {
-    target_angle_ = target_speed;
+    target_speed_ = target_speed;
     feedforward_intensity_ = feedforward_intensity;
     control_method_ = SPEED;
 }
@@ -74,18 +76,19 @@ void Motor::handle()
             }
         case POSITION_SPEED:
             {
-                float speed_from_position = spid_.calc(target_angle_,fdb_angle_);
-                float total_speed = speed_from_position + feedforward_speed_;
-                float intensity_from_speed = ppid_.calc(target_speed_,total_speed);
+                float speed_from_position = ppid_.calc(target_angle_,fdb_angle_);
+                target_speed_ = speed_from_position + feedforward_speed_;
+                float intensity_from_speed = spid_.calc(target_speed_,fdb_speed_);
                 output_intensity_ = intensity_from_speed + feedforward_intensity_;
             }
     }
 }
 
-void Motor::FeedforwardIntensityCalc()
+float Motor::FeedforwardIntensityCalc()
 {
     feedforward_intensity_ = 0.5*9.8*sin(angle_/180*3.14159265358979323846)*0.05524/0.3*16384/20;
-
+    float feedforward_intensity = feedforward_intensity_;
+    return feedforward_intensity;
 }
 
 void Motor::output()
@@ -94,4 +97,5 @@ void Motor::output()
     tx_data[0] = (intensity >> 8) & 0xFF;
     tx_data[1] = intensity & 0xFF;
 }
+
 

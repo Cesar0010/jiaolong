@@ -12,7 +12,7 @@ class Motor
     float rotate_speed_;
     float current_;
     float temp_;
-    bool flag;
+    bool init_flag_;
     PID spid_, ppid_;
     float target_angle_, fdb_angle_;
     float target_speed_, fdb_speed_, feedforward_speed_;
@@ -26,7 +26,7 @@ public:
     void SetPosition(float target_position, float feedforward_speed, float feedforward_intensity);
     void SetSpeed(float target_speed, float feedforward_intensity);
     void SetIntensity(float intensity);
-    void FeedforwardIntensityCalc();
+    float FeedforwardIntensityCalc();
     Motor(const float ratio, float p_kp, float p_ki, float p_kd, float s_kp, float s_ki, float s_kd,
     float p_imax, float s_imax, float p_out_max, float s_out_max, float p_d_filter_k, float s_d_filter_k)
     : ratio_(ratio),
@@ -48,7 +48,7 @@ public:
         feedforward_speed_ = 0.0f;
         feedforward_intensity_ = 0.0f;
         output_intensity_ = 0.0f;
-        flag = true;
+        init_flag_ = true;
         control_method_ = TORQUE;
     }
     void canRxMsgCallback(const uint8_t rx_data[8]);

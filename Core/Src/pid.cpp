@@ -35,7 +35,7 @@ float PID::calc(float ref, float fdb)
 {
     ref_ = ref;
     fdb_ = fdb;
-    err_ = ref - fdb;
+    err_ = ref_ - fdb_;
     pout_ = kp_ * err_;
     err_sum_ += err_;
     if(err_sum_ > i_max_)
