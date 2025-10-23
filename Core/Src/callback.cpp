@@ -12,7 +12,7 @@ extern uint8_t rx_data[8];
 extern uint32_t can_tx_mail_box_;
 extern uint8_t stop_flag;
 extern float target_angle;
-Motor motor(3591.0f/187.0f,10,0,0,22,0,6,1000,1000,5000,5000,0.1,0.02);
+Motor motor(3591.0f/187.0f,170,0.01,10,15.4,0,4.2,4000,4000,16384,16384,0.02,0.02);
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
